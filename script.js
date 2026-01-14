@@ -1,84 +1,31 @@
-let currentDate = new Date();
-let selectedDate = null;
+const taskInput = document.getElementById('taskInput');
+const addTaskBtn = document.getElementById('addTaskBtn');
+const taskList = document.getElementById('taskList');
 
-const dates = document.getElementById("dates");
-const monthYear = document.getElementById("monthYear");
-const todayDisplay = document.getElementById("todayDisplay");
-const selectedDisplay = document.getElementById("selectedDisplay");
+function addTask() {
+    const taskText = taskInput.value.trim();
+    if (taskText === '') return;
 
-function renderCalendar() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const today = new Date();
+    const li = document.createElement('li');
+    li.textContent = taskText;
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month + 1, 0).getDate();
-
-    monthYear.textContent = currentDate.toLocaleString("default", {
-        month: "long",
-        year: "numeric"
+    li.addEventListener('click', () => {
+        li.classList.toggle('done');
     });
 
-    dates.innerHTML = "";
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        taskList.removeChild(li);
+    });
 
-    for (let i = 0; i < firstDay; i++) {
-        dates.appendChild(document.createElement("div"));
-    }
-
-    for (let day = 1; day <= lastDate; day++) {
-        const dateDiv = document.createElement("div");
-        dateDiv.textContent = day;
-
-    
-        if (
-            day === today.getDate() &&
-            month === today.getMonth() &&
-            year === today.getFullYear()
-        ) {
-            dateDiv.classList.add("today");
-        }
-
-    
-        dateDiv.addEventListener("click", () => {
-            if (selectedDate) {
-                selectedDate.classList.remove("selected");
-            }
-            dateDiv.classList.add("selected");
-            selectedDate = dateDiv;
-            updateStatus();
-        });
-
-        dates.appendChild(dateDiv);
-    }
-
-    updateStatus();
+    li.appendChild(removeBtn);
+    taskList.appendChild(li);
+    taskInput.value = '';
 }
 
-function updateStatus() {
-    const today = new Date();
-    todayDisplay.textContent = `Today: ${today.toDateString()}`;
-
-    if (selectedDate) {
-        const monthName = currentDate.toLocaleString("default", { month: "long" });
-        selectedDisplay.textContent = `Selected: ${monthName} ${selectedDate.textContent}, ${currentDate.getFullYear()}`;
-    } else {
-        selectedDisplay.textContent = "Selected: None";
-    }
-}
-
-function nextMonth() {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    selectedDate = null;
-    renderCalendar();
-}
-
-function prevMonth() {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    selectedDate = null;
-    renderCalendar();
-}
-
-document.getElementById("nextBtn").addEventListener("click", nextMonth);
-document.getElementById("prevBtn").addEventListener("click", prevMonth);
-
-renderCalendar();
+addTaskBtn.addEventListener('click', addTask);
+taskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
